@@ -5,10 +5,8 @@ class IssueFilter extends React.Component{
         );
     }
 }
-class IssueRow extends React.Component{
-    
-    render(){
-        const issue=this.props.issue;
+function IssueRow(props){
+    const issue=props.issue;
         return(
             <tr>
                 <td>{issue.id}</td>
@@ -21,31 +19,36 @@ class IssueRow extends React.Component{
             </tr>
 
         );
-    }
 }
-class IssueTable extends React.Component{
-    render(){
-        const issues = [  {    
-            id: 1, 
-            status: 'New', 
-            owner: 'Ravan', 
-            effort: 5,    
-            created: new Date('2018-08-15'), 
-            due: undefined,    
-            title: 'Error in console when clicking Add',  },
-        {
-            id: 2, 
-            status: 'Assigned', 
-            owner: 'Eddie', 
-            effort: 14,    
-            created: new Date('2018-08-16'), 
-            due: new Date('2018-08-30'),    
-            title: 'Missing bottom border on panel',
-        }]
-        const issueRows = issues.map(issue => <IssueRow rowStyle={rowStyle} issue={issue}/>); 
-        const rowStyle = {};
-        return(
-            <table className="bordered-table">
+
+
+const IntialIssues = [  {    
+    id: 1, 
+    status: 'New', 
+    owner: 'Ravan', 
+    effort: 5,    
+    created: new Date('2018-08-15'), 
+    due: undefined,    
+    title: 'Error in console when clicking Add',  },
+{
+    id: 2, 
+    status: 'Assigned', 
+    owner: 'Eddie', 
+    effort: 14,    
+    created: new Date('2018-08-16'), 
+    due: new Date('2018-08-30'),    
+    title: 'Missing bottom border on panel',
+}]
+const issue={
+        status: 'New',
+        owner: 'Pieta',
+        title : 'completion date should be optional'
+    };
+
+function IssueTable(props){
+    const issueRows = props.issues.map(issue => <IssueRow  issue={issue}/>); 
+    const rowStyle = {};
+    return( <table className="bordered-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -60,27 +63,67 @@ class IssueTable extends React.Component{
                 <tbody>
                  {issueRows}
                 </tbody>               
-            </table>
-        );
-    }
+            </table>);
 }
+
 class IssueAdd extends React.Component{
+    constructor(){
+        super();
+        this.handleSubmit=this.handleSubmit.bind(this);
+    }
+    handleSubmit(e){
+        e.preventDefault();
+        const form=document.forms.issueAdd;
+        const issue={
+            owner : form.owner.value,
+            title : form.title.value,
+            status : 'New',
+        }
+        this.props.createIssue(issue);
+        form.owner.value="";
+        form.title.value="";
+    }
     render(){
         return(
-            <div>Placeholder for ADD</div>
+            <form name="issueAdd" onSubmit={this.handleSubmit}>        
+                <input type="text" name="owner" placeholder="Owner" />        
+                <input type="text" name="title" placeholder="Title" />        
+                <button>Add</button>      
+            </form> 
         );
     }
 }
 class IssueList extends React.Component{
+    constructor(){
+        super();
+        this.state={issues: []};
+        this.createIssue=this.createIssue.bind(this);
+    }
+    loadData(){
+        setTimeout(()=>{
+            this.setState({issues:IntialIssues});
+        },500);
+    }
+    createIssue(issue){
+            let copiedIssue = Object.assign({}, issue);
+            copiedIssue.id=this.state.issues.length+1;
+            copiedIssue.created=new Date();
+            const newIssueList=this.state.issues.slice();
+            newIssueList.push(copiedIssue);
+            this.setState({issues:newIssueList});
+    }
+    componentDidMount(){
+        this.loadData();
+    }
     render(){
         return(
             <React.Fragment>
                 <h1>Issue Tracker</h1>
                 <IssueFilter/>
                 <hr />
-                <IssueTable />
+                <IssueTable issues={this.state.issues}/>
                 <hr />
-                <IssueAdd />
+                <IssueAdd createIssue={this.createIssue}/>
             </React.Fragment>
         );
     }
