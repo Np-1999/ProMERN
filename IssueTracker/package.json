@@ -2,7 +2,7 @@
   "name": "issuetracker",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js", 
+  "main": "index.js",
   "scripts": {
     "start": "nodemon -w server index.js",
     "compile": "babel src --out-dir public",
@@ -12,7 +12,9 @@
   "author": "nikhil.padole1999@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "apollo-server-express": "^2.14.1",
+    "express": "^4.17.1",
+    "graphql": "^15.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
