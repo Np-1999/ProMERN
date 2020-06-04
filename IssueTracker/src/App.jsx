@@ -12,9 +12,9 @@ function IssueRow(props){
                 <td>{issue.id}</td>
                 <td>{issue.status}</td>
                 <td>{issue.owner}</td>
-                <td>{issue.created.toDateString()}</td>
+                <td>{issue.created}</td>
                 <td>{issue.effort}</td>
-                <td>{issue.due ? issue.due.toDateString():''}</td>
+                <td>{issue.due ? issue.due:''}</td>
                 <td>{issue.title}</td>
             </tr>
 
@@ -99,11 +99,30 @@ class IssueList extends React.Component{
         this.state={issues: []};
         this.createIssue=this.createIssue.bind(this);
     }
-    loadData(){
-        setTimeout(()=>{
-            this.setState({issues:IntialIssues});
-        },500);
+    async loadData(){
+        const query=`
+        query{
+            issueList{
+                id
+                status
+                owner
+	            title
+                effort
+                created
+                due
+            }
+        }`;
+        const response= await fetch('/graphql',{
+            method:'POST',
+            headers : { 'Content-Type': 'application/JSON'},
+            body:JSON.stringify({query})
+        });
+        const result= await response.json();
+        console.log(result.data);
+        this.setState({ issues:result.data.issueList });
+        console.log(this.state.issues);
     }
+    
     createIssue(issue){
             let copiedIssue = Object.assign({}, issue);
             copiedIssue.id=this.state.issues.length+1;
@@ -112,7 +131,7 @@ class IssueList extends React.Component{
             newIssueList.push(copiedIssue);
             this.setState({issues:newIssueList});
     }
-    componentDidMount(){
+    async componentDidMount(){
         this.loadData();
     }
     render(){
