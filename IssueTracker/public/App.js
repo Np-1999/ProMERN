@@ -998,7 +998,7 @@ var IssueAdd = /*#__PURE__*/function (_React$Component2) {
       var issue = {
         owner: form.owner.value,
         title: form.title.value,
-        status: 'New'
+        due: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10)
       };
       this.props.createIssue(issue);
       form.owner.value = "";
@@ -1092,32 +1092,59 @@ var IssueList = /*#__PURE__*/function (_React$Component3) {
     }()
   }, {
     key: "createIssue",
-    value: function createIssue(issue) {
-      var copiedIssue = Object.assign({}, issue);
-      copiedIssue.id = this.state.issues.length + 1;
-      copiedIssue.created = new Date();
-      var newIssueList = this.state.issues.slice();
-      newIssueList.push(copiedIssue);
-      this.setState({
-        issues: newIssueList
-      });
-    }
-  }, {
-    key: "componentDidMount",
     value: function () {
-      var _componentDidMount = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2() {
+      var _createIssue = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2(issue) {
+        var query, response;
         return _regenerator.default.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                query = "mutation{\n                issueAdd(issue:{\n                    title: \"".concat(issue.title, "\",\n                    owner : \"").concat(issue.owner, "\",\n                    due : \"").concat(issue.due.toISOString(), "\"\n                }){\n                    id\n                }\n            }");
+                _context2.next = 3;
+                return fetch('/graphql', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    query: query
+                  })
+                });
+
+              case 3:
+                response = _context2.sent;
                 this.loadData();
 
-              case 1:
+              case 5:
               case "end":
                 return _context2.stop();
             }
           }
         }, _callee2, this);
+      }));
+
+      function createIssue(_x) {
+        return _createIssue.apply(this, arguments);
+      }
+
+      return createIssue;
+    }()
+  }, {
+    key: "componentDidMount",
+    value: function () {
+      var _componentDidMount = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee3() {
+        return _regenerator.default.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.loadData();
+
+              case 1:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
       }));
 
       function componentDidMount() {

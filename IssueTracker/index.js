@@ -3,7 +3,6 @@ const fs=require('fs');
 const { ApolloServer }= require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language'); 
-console.log(require('apollo-server-express'));
 const app=express();
 let aboutMessage = "Issue Tracker API v1.0"; 
 const issuesDB = [  
