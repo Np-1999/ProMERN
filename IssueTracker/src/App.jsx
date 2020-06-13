@@ -100,6 +100,30 @@ class IssueAdd extends React.Component{
         );
     }
 }
+async function graphQLFetch(query, variables = {}) {  
+    try {    
+        const response = await fetch('/graphql', { 
+                 method: 'POST',      
+                 headers: { 'Content-Type': 'application/json'},      
+                 body: JSON.stringify({ query, variables })    });    
+                 const body = await response.text();    
+                 const result = JSON.parse(body, jsonDateReviver);
+    if (result.errors) {      
+        const error = result.errors[0];      
+        if (error.extensions.code == 'BAD_USER_INPUT') {        
+            const details = error.extensions.exception.errors.join('\n ');        
+            alert(`${error.message}:\n ${details}`);      
+        } 
+        else {        
+            alert(`${error.extensions.code}: ${error.message}`);      
+        }    
+    }    
+    return result.data;
+  } 
+  catch (e) {    
+      alert(`Error in sending data to server: ${e.message}`);  
+    } 
+} 
 class IssueList extends React.Component{
     constructor(){
         super();
@@ -119,34 +143,23 @@ class IssueList extends React.Component{
                 due
             }
         }`;
-        const response= await fetch('/graphql',{
-            method:'POST',
-            headers : { 'Content-Type': 'application/JSON'},
-            body:JSON.stringify({query})
-        });
-        const body= await response.text();
-        const result= JSON.parse(body,jsonDateReviver);
-        console.log(result.data);
-        this.setState({ issues:result.data.issueList });
-        console.log(this.state.issues);
+        const data = await graphQLFetch(query);    
+        if (data) {      
+            this.setState({ issues: data.issueList });    
+        } 
+        
     }
     
     async createIssue(issue){
-            const query=`mutation{
-                issueAdd(issue:{
-                    title: "${issue.title}",
-                    owner : "${issue.owner}",
-                    due : "${issue.due.toISOString()}"
-                }){
+            const query=`mutation issueAdd($issue:IssueInputs!){
+                issueAdd(issue:$issue){
                     id
                 }
             }`;
-            const response = await fetch('/graphql',{
-                method :'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({query})
-            });
-            this.loadData();
+            const data = await graphQLFetch(query, { issue });    
+            if (data) {      
+                this.loadData();    
+            } 
     }
     async componentDidMount(){
         this.loadData();
