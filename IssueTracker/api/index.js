@@ -8,7 +8,7 @@ require('dotenv').config({path:'sample.env'});
 const app=express();
 let aboutMessage = "Issue Tracker API v1.0";
 let db;
-const url = 'mongodb://localhost/IssueTracker';
+const url = process.env.DB_URL||'mongodb://localhost/IssueTracker';
 async function connectToDb(){
     const client = new MongoClient(url,{useNewUrlParser:true});
     await client.connect();
