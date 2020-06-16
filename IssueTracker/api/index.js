@@ -109,8 +109,7 @@ async function issueAdd(_,{issue}){
     const savedIssue = await db.collection('issues').findOne({_id:result.insertedId}); 
     return savedIssue;
 }
-const fileMiddleWare=express.static('public/');
-app.use('/',fileMiddleWare);
+
 server.applyMiddleware({app,path:'/graphql'});
 /*app.get('/',(req,res)=>{
     res.sendFile('public/index.html');
@@ -119,7 +118,7 @@ server.applyMiddleware({app,path:'/graphql'});
     try{
         await connectToDb();
         app.listen(3000,()=>{
-            console.log("Server listening on 3000");
+            console.log("API Server listening on 3000");
         });
     }catch(err){
         console.log("Error:",err)
