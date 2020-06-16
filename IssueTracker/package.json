@@ -15,7 +15,8 @@
   "dependencies": {
     "apollo-server-express": "^2.14.2",
     "express": "^4.17.1",
-    "graphql": "^15.0.0"
+    "graphql": "^15.0.0",
+    "mongodb": "^3.5.9"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",

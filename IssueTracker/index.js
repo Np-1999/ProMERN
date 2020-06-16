@@ -3,8 +3,26 @@ const fs=require('fs');
 const { ApolloServer, UserInputError }= require('apollo-server-express');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language'); 
+const { MongoClient }=require('mongodb');
 const app=express();
-let aboutMessage = "Issue Tracker API v1.0"; 
+let aboutMessage = "Issue Tracker API v1.0";
+let db;
+const url = 'mongodb://localhost/IssueTracker';
+async function connectToDb(){
+    const client = new MongoClient(url,{useNewUrlParser:true});
+    await client.connect();
+    console.log("Connected to mongodb at ",url);
+    db=client.db();
+ } 
+async function getNextSequence(name) {  
+    const result = await db.collection('counters').findOneAndUpdate(    
+         { _id: name },    
+         { $inc: { current: 1 } },    
+         { returnOriginal: false },  
+    );  
+    return result.value.current; 
+}
+
 const issuesDB = [  
     {    
         id: 1, 
@@ -75,19 +93,21 @@ function validateIssue(issue){
         throw new UserInputError('Invalid input(s)', { errors });  
     } 
 }
-function issueList(){
-    return issuesDB;
+async function issueList(){
+    const issues= await db.collection('issues').find({}).toArray();
+    return issues;
 }
 function setAboutMessage(_,{message}){
     return aboutMessage=message;
 }
-function issueAdd(_,{issue}){
+async function issueAdd(_,{issue}){
     console.log(issue);
     validateIssue(issue);
     issue.created=new Date();
-    issue.id=issuesDB.length+1;
-    issuesDB.push(issue);
-    return issue;
+    issue.id=await getNextSequence('issues');
+    const result = await db.collection('issues').insertOne(issue);
+    const savedIssue = await db.collection('issues').findOne({_id:result.insertedId}); 
+    return savedIssue;
 }
 const fileMiddleWare=express.static('public/');
 app.use('/',fileMiddleWare);
@@ -95,6 +115,13 @@ server.applyMiddleware({app,path:'/graphql'});
 /*app.get('/',(req,res)=>{
     res.sendFile('public/index.html');
 });*/
-app.listen(3000,()=>{
-    console.log("Server listening on 3000");
-})
+(async function (){
+    try{
+        await connectToDb();
+        app.listen(3000,()=>{
+            console.log("Server listening on 3000");
+        });
+    }catch(err){
+        console.log("Error:",err)
+    }
+})();
