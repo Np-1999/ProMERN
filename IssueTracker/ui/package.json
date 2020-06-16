@@ -23,6 +23,7 @@
     "@babel/preset-react": "^7.10.1",
     "@babel/runtime": "^7.10.2",
     "browserify": "^16.5.1",
+    "dotenv": "^8.2.0",
     "nodemon": "^2.0.4",
     "uniq": "^1.0.1"
   }
