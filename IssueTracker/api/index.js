@@ -110,8 +110,9 @@ async function issueAdd(_,{issue}){
     const savedIssue = await db.collection('issues').findOne({_id:result.insertedId}); 
     return savedIssue;
 }
-
-server.applyMiddleware({app,path:'/graphql'});
+const enableCors = (process.env.ENABLE_CORS || 'true') == 'true'; 
+console.log('CORS setting:', enableCors); 
+server.applyMiddleware({app,path:'/graphql',cors: enableCors });
 /*app.get('/',(req,res)=>{
     res.sendFile('public/index.html');
 });*/
