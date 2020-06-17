@@ -13,9 +13,12 @@
     "apollo-server-express": "^2.14.2",
     "express": "^4.17.1",
     "graphql": "^15.0.0",
-    "mongodb": "^3.5.9"
+    "mongodb": "^3.5.9",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0"
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.21.2"
   }
 }
