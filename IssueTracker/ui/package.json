@@ -2,20 +2,26 @@
   "name": "issue-tracker-ui",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "UIServer.js",
   "scripts": {
-    "start": "nodemon -e js,graphql ",
-    "compile": "babel src --out-dir public",
-    "watch": "babel src --out-dir public --watch --verbose",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "publish": "browserify public/App.js -o public/App.js"
+    "#start": "UI server. HMR is enabled in dev mode.", 
+    "start": "nodemon -e js --ignore src/ --ignore public/  ",
+    "#compile": "Generates JS bundles for production. Use with start.",
+    "compile": "webpack --mode production",
+    "#watch": "Compile, and recompile on any changes.",
+    "watch": "webpack --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "nikhil.padole1999@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "core-js": "^3.6.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.4",
-    "dotenv": "^8.2.0"
+    "regenerator-runtime": "^0.13.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
@@ -24,6 +30,7 @@
     "@babel/preset-env": "^7.10.1",
     "@babel/preset-react": "^7.10.1",
     "@babel/runtime": "^7.10.2",
+    "babel-loader": "^8.1.0",
     "browserify": "^16.5.1",
     "eslint": "^7.2.0",
     "eslint-config-airbnb": "^18.1.0",
@@ -31,6 +38,12 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.20.0",
     "nodemon": "^2.0.4",
-    "uniq": "^1.0.1"
+    "prop-types": "^15.7.2",
+    "uniq": "^1.0.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-hot-middleware": "^2.25.0",
+    "whatwg-fetch": "^3.0.0"
   }
 }
