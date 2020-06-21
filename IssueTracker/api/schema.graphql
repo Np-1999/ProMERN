@@ -14,6 +14,7 @@ input IssueInputs{
     owner : String
     effort : Int
     due: GraphQLDate
+    description : String
 }
 type Issue{
     _id: ID!
@@ -24,11 +25,13 @@ type Issue{
     effort  : Int
     created : GraphQLDate!
     due : GraphQLDate
+    description : String
 }
 ### TOP LEVEL DECLARATIONS
 type Query{
     about :String!
-    issueList : [Issue!]!
+    issueList(status: StatusType) : [Issue!]!
+    issue (id:Int!) : Issue!
 }
 type Mutation{
     setAboutMessage(message:String!): String!

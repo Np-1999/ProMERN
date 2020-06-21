@@ -1,6 +1,7 @@
 const express = require('express');
 require('dotenv').config({ path: 'sample.env' });
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const path = require('path');
 
 const app = express();
 const UI_API_ENDPOINT = process.env.UI_API_ENDPOINT || 'http://localhost:3000/graphql';
@@ -29,6 +30,9 @@ if (enableHMR && (process.env.NODE_ENV !== 'production')) {
   app.use(hotMiddleware(compiler));
 }
 app.use(express.static('public'));
+app.get('*',(req, res)=>{
+  res.sendFile(path.resolve('public/index.html'));
+});
 const port = process.env.UI_SERVER_PORT || 8000;
 app.listen(port, () => {
   console.log('UI server listening on port', port);
