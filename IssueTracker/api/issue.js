@@ -49,4 +49,27 @@ async function get(_,{ id }){
   const issue = await db.collection('issues').findOne(filter);
   return issue;
 }
-module.exports = { List, Add, get };
+async function update(_,{ id, changes }){
+  const db = getDB();
+  if( changes.title || changes.owner || changes.status ){
+    const issue = await db.collection('issues').findOne({ id });
+    Object.assign(issue, changes);
+    validate(issue);
+  } 
+  await db.collection('issues').updateOne({ id }, { $set: changes });
+  const savedIssue = await db.collection('issues').findOne({ id });
+  return savedIssue;
+}
+async function Delete(_,{id}){
+  const db= getDB();
+  const issue = await db.collection('issues').findOne({id});
+  if(!issue) return false;
+  issue.deleted = new Date();
+  let result =await db.collection('deletedIssue').insertOne(issue);
+  if(result.insertedId) {
+    result = await db.collection('issues').removeOne({id});
+    return result.deletedCount === 1;
+  }
+  return false;
+}
+module.exports = { List, Add, get, update, Delete };

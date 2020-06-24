@@ -27,7 +27,7 @@ export default class IssueEdit extends React.Component{
     id = parseInt(id);
     const data = await graphQLFetch(query,{ id });
     console.log(data);
-    this.setState({ issue: data ? data.issue: {}, invalidFields: {} });
+    this.setState({ issue: (data ? data.issue: {}), invalidFields: {} });
   }
   onChange(e, naturalValue) {
     const {name, value: textValue} = e.target;
@@ -46,10 +46,32 @@ export default class IssueEdit extends React.Component{
       return { invalidFields };
     });
   }
-  handleSubmit(e){
+  async handleSubmit(e) {
     e.preventDefault();
-    const { issue } = this.state;
+    const { issue, invalidFields } =  this.state;
     console.log(issue);
+    if(Object.keys(invalidFields).length !== 0 ) return;
+    const query = `mutation issueUpdate(
+      $id: Int!
+      $changes: issueUpdateInputs!
+    ){
+      issueUpdate(
+        id: $id
+        changes: $changes
+      ){
+        id title status owner created effort
+        due description
+      }
+    }`;
+    const { id, created, ...changes } = issue;
+    const data = await graphQLFetch(query, { changes, id});
+    if(data){
+      this.setState({
+        issue:data.issueUpdate
+      });
+      console.log("After query ");
+      alert ('Updated issue successfully');
+    }
   }
   componentDidMount(){
     this.loadData();
@@ -88,7 +110,7 @@ export default class IssueEdit extends React.Component{
         <h3>{`Editing issue ${id}`}</h3> 
         <table>
           <tr>
-            <td>Created</td>
+            <td>Created_qwe</td>
             <td>{created.toDateString()}</td>
           </tr>
           <tr><td>Status:</td>
