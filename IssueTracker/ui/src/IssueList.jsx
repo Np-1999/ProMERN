@@ -33,9 +33,25 @@ export default class IssueList extends React.Component {
     if (param.get('status')) {
       vars.status = param.get('status');
     }
+    const effortMin = parseInt(param.get('effortMin'), 10);
+    if(!Number.isNaN(effortMin)) {
+      vars.effortMin = effortMin;
+    }
+    const effortMax = parseInt(param.get('effortMax'), 10);
+    if(!Number.isNaN(effortMax)) {
+      vars.effortMax = effortMax;
+    }
     const query = `
-          query issueList($status:StatusType){
-              issueList(status:$status){
+          query issueList(
+            $status:StatusType
+            $effortMin: Int
+            $effortMax: Int
+            ){
+              issueList(
+                status:$status
+                effortMin: $effortMin
+                effortMax: $effortMax
+                ){
                   id
                   status
                   owner

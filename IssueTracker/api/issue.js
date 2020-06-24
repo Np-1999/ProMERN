@@ -13,11 +13,20 @@ function validate(issue) {
     throw new UserInputError('Invalid input(s)', { errors });
   }
 }
-async function List(_, { status }) {
+async function List(_, { status, effortMin, effortMax }) {
   const db = getDB();
   const filter = {};
   if (status) {
     filter.status = status;
+  }
+  if(effortMin !== undefined || effortMax !== undefined) {
+    filter.effort={};
+    if( effortMin !== undefined ) {
+      filter.effort.$gte = effortMin; 
+    }
+    if( effortMax !== undefined ) {
+      filter.effort.$lte = effortMax;
+    }
   }
   const issues = await db.collection('issues').find(filter).toArray();
   return issues;
