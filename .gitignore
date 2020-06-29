@@ -3,3 +3,4 @@ IssueTracker/api/node_modules
 IssueTracker/ui/node_modules
 IssueTracker/ui/sample.env
 IssueTracker/api/sample.env
+IssueTracker/ui/public/bootstrap

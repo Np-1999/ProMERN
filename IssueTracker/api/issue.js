@@ -19,12 +19,12 @@ async function List(_, { status, effortMin, effortMax }) {
   if (status) {
     filter.status = status;
   }
-  if(effortMin !== undefined || effortMax !== undefined) {
-    filter.effort={};
-    if( effortMin !== undefined ) {
-      filter.effort.$gte = effortMin; 
+  if (effortMin !== undefined || effortMax !== undefined) {
+    filter.effort = {};
+    if (effortMin !== undefined) {
+      filter.effort.$gte = effortMin;
     }
-    if( effortMax !== undefined ) {
+    if (effortMax !== undefined) {
       filter.effort.$lte = effortMax;
     }
   }
@@ -42,34 +42,37 @@ async function Add(_, { issue }) {
   const savedIssue = await db.collection('issues').findOne({ _id: result.insertedId });
   return savedIssue;
 }
-async function get(_,{ id }){
+async function get(_, { id }) {
   const db = getDB();
   const filter = {};
   filter.id = id;
   const issue = await db.collection('issues').findOne(filter);
   return issue;
 }
-async function update(_,{ id, changes }){
+async function update(_, { id, changes }) {
   const db = getDB();
-  if( changes.title || changes.owner || changes.status ){
+  if (changes.title || changes.owner || changes.status) {
     const issue = await db.collection('issues').findOne({ id });
     Object.assign(issue, changes);
     validate(issue);
-  } 
+  }
   await db.collection('issues').updateOne({ id }, { $set: changes });
   const savedIssue = await db.collection('issues').findOne({ id });
   return savedIssue;
 }
-async function Delete(_,{id}){
-  const db= getDB();
-  const issue = await db.collection('issues').findOne({id});
-  if(!issue) return false;
+async function Delete(_, { id }) {
+  const db = getDB();
+  const issue = await db.collection('issues').findOne({ id });
+  if (!issue) return false;
   issue.deleted = new Date();
-  let result =await db.collection('deletedIssue').insertOne(issue);
-  if(result.insertedId) {
-    result = await db.collection('issues').removeOne({id});
-    return result.deletedCount === 1;
+  let result = await db.collection('deletedIssue').insertOne(issue);
+  if (result.insertedId) {
+    result = await db.collection('issues').removeOne({ id });
+    console.log(result.deletedCount);
+    return (result.deletedCount === 1);
   }
   return false;
 }
-module.exports = { List, Add, get, update, Delete };
+module.exports = {
+  List, Add, get, update, Delete,
+};

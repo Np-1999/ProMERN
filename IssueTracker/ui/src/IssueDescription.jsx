@@ -14,7 +14,7 @@ export default class IssueDescription extends React.Component {
   componentDidUpdate(prevProps) {
     const { match: { params: { id: prevId } } } = prevProps;
     const { match: { params: { id } } } = this.props;
-    if (prevId != id) {
+    if (prevId !== id) {
       this.loadData();
     }
   }
@@ -26,7 +26,7 @@ export default class IssueDescription extends React.Component {
                 id description
             }
         }`;
-    id = parseInt(id);
+    id = parseInt(id, 10);
     const data = await graphQLFetch(query, { id });
     if (data) {
       this.setState({ issue: data.issue });

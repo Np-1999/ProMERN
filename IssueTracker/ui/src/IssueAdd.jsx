@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  Form, FormLabel, FormControl, FormGroup, Button,
+} from 'react-bootstrap';
 
 export default class IssueAdd extends React.Component {
   constructor() {
@@ -22,11 +25,20 @@ export default class IssueAdd extends React.Component {
 
   render() {
     return (
-      <form name="issueAdd" onSubmit={this.handleSubmit}>
-        <input type="text" name="owner" placeholder="Owner" />
-        <input type="text" name="title" placeholder="Title" />
-        <button type="submit">Add</button>
-      </form>
+      <Form inline name="issueAdd" onSubmit={this.handleSubmit}>
+        <FormGroup className="mr-2">
+          <FormLabel className="mr-2">Owner:</FormLabel>
+          {' '}
+          <FormControl type="text" name="owner" />
+        </FormGroup>
+        <FormGroup>
+          {' '}
+          <FormLabel className="mr-2">Title:</FormLabel>
+          {' '}
+          <FormControl type="text" name="title" className="mr-2" />
+        </FormGroup>
+        <Button variant="primary" type="submit">Add</Button>
+      </Form>
     );
   }
 }
