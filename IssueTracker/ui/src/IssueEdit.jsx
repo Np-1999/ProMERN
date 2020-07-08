@@ -9,12 +9,16 @@ import graphQLFetch from './graphQL.js';
 import NumInput from './NumInput.jsx';
 import DateInput from './DateInput.jsx';
 import TextInput from './TextInput.jsx';
+import store from './store';
 
 export default class IssueEdit extends React.Component {
+
   constructor() {
+    const issue = store.intialData ? store.intialData.issue : null;
+    delete store.intialData;
     super();
     this.state = {
-      issue: {},
+      issue,
       invalidFields: {},
       showingValidation: false,
       showToast: false,
@@ -27,9 +31,24 @@ export default class IssueEdit extends React.Component {
     this.dismissValidation = this.dismissValidation.bind(this);
     this.showError = this.showError.bind(this);
   }
+  static async fetchData(match, search, showError){
+    const query = ` query issue($id: Int!) {
+        issue(id: $id) {
+          id title status owner effort created
+          due description
+        }
+      }`;
+    let {  params: { id }  } = match;
+    id = parseInt(id, 10);
+    const result= await graphQLFetch(query, { id }, showError);
+    return result;
+  }
 
   componentDidMount() {
-    this.loadData();
+    const { issue } = this.state;
+    if( issue==null ){
+      this.loadData();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -106,20 +125,15 @@ export default class IssueEdit extends React.Component {
   }
 
   async loadData() {
-    const query = ` query issue($id: Int!) {
-      issue(id: $id) {
-        id title status owner effort created
-        due description
-      }
-    }`;
-    let { match: { params: { id } } } = this.props;
-    id = parseInt(id, 10);
-    const data = await graphQLFetch(query, { id }, this.showError);
-    console.log(data);
+
+    const { match } = this.props;
+    const data = await IssueEdit.fetchData(match,null,this.showError);
     this.setState({ issue: (data ? data.issue : {}), invalidFields: {} });
   }
 
   render() {
+    const { issue } = this.state;
+    if( issue==null ) return null;
     const { issue: { id } } = this.state;
     console.log(id);
     const { match: { params: { id: propsId } } } = this.props;

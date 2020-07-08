@@ -7,12 +7,17 @@ import IssueFilter from './IssueFilter.jsx';
 import IssueTable from './IssueTable.jsx';
 import IssueAdd from './IssueAdd.jsx';
 import IssueDescription from './IssueDescription.jsx';
+import store from './store.js';
 
 export default class IssueList extends React.Component {
   constructor() {
     super();
+    const issues = store.intialData ? store.intialData.issueList : null;
+    const selectedIssue = store.intialData ? store.intialData.issue : null;
+    delete store.intialData;
     this.state = {
-      issues: [],
+      issues,
+      selectedIssue,
       toastMessage: '',
       toastShow: false,
     };
@@ -22,30 +27,15 @@ export default class IssueList extends React.Component {
     this.showError = this.showError.bind(this);
   }
 
-  async componentDidMount() {
-    this.loadData();
-  }
-
-  componentDidUpdate(prevProps) {
-    const { location: { search: prevSearch } } = prevProps;
-    const { location: { search } } = this.props;
-    if (prevSearch !== search) {
-      this.loadData();
-    }
-  }
-
-  showError(message) {
-    this.setState({ toastShow: true, toastMessage: message });
-  }
-
-  showSucess(message) {
-    this.setState({ toastShow: true, toastMessage: message });
-  }
-
-  async loadData() {
-    const { location: { search } } = this.props;
+  static async fetchData(match, search, showError){
     const param = new URLSearchParams(search);
-    const vars = {};
+    const vars = {hasSelection: false, selectedId: 0  };
+    const {params:{ id } } = match;
+    const idInt = parseInt(id,10);
+    if(!Number.isNaN(idInt)){
+      vars.hasSelection = true;
+      vars.selectedId = idInt; 
+    }
     if (param.get('status')) {
       vars.status = param.get('status');
     }
@@ -59,6 +49,8 @@ export default class IssueList extends React.Component {
     }
     const query = `
           query issueList(
+            $hasSelection:Boolean!
+            $selectedId: Int!
             $status:StatusType
             $effortMin: Int
             $effortMax: Int
@@ -76,10 +68,43 @@ export default class IssueList extends React.Component {
                   created
                   due
               }
+              issue(id: $selectedId) @include (if: $hasSelection) {
+                id description
+              }
           }`;
     const data = await graphQLFetch(query, vars, this.showError);
+    return data;
+  }
+
+  async componentDidMount() {
+    const { issues } = this.state;
+    if ( issues==null ){
+      this.loadData();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { location: { search: prevSearch }, 
+    match:{params: {id: prevId}}} = prevProps;
+    const { location: { search }, match:{ params: { id } } } = this.props;
+    if (prevSearch !== search || prevId!==id  ) {
+      this.loadData();
+    }
+  }
+
+  showError(message) {
+    this.setState({ toastShow: true, toastMessage: message });
+  }
+
+  showSucess(message) {
+    this.setState({ toastShow: true, toastMessage: message });
+  }
+
+  async loadData() {
+    const {location :{ search }, match } = this.props;
+    const data = await IssueList.fetchData(match, search, this.showError);
     if (data) {
-      this.setState({ issues: data.issueList });
+      this.setState({ issues: data.issueList, selectedIssue: data.issue  });
     }
   }
 
@@ -142,6 +167,8 @@ export default class IssueList extends React.Component {
 
   render() {
     const { issues } = this.state;
+    const { selectedIssue } = this.state;
+    if(issues == null) return null;
     const { match } = this.props;
     const { toastShow, toastMessage } = this.state;
     return (
@@ -173,7 +200,7 @@ export default class IssueList extends React.Component {
             {toastMessage}
           </Toast.Body>
         </Toast>
-        <Route path={`${match.path}/:id`} component={IssueDescription} />
+        <IssueDescription issue={selectedIssue} />
       </>
     );
   }

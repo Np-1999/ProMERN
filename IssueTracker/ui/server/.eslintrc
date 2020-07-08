@@ -1,0 +1,10 @@
+{  
+    "extends": "airbnb",
+    "env" : {
+        "node": true
+    },
+    "rules": {
+        "no-console": "off",
+        "import/extensions": "off"
+    }
+}

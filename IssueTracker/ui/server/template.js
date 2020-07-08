@@ -1,7 +1,9 @@
-<html>
+import serialize from 'serialize-javascript';
+export default function template(body,data) {
+    return `<html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        
+        <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />        
         <style>
             .test{
                 color:blue;
@@ -20,13 +22,14 @@
             }
             table.table-hover tr {cursor: pointer;}
         </style>
-        <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
-        
     </head>
     <body>
-        <div id="content"></div> 
-        <script src="/env.js"></script>
-        <script src="/vendor.bundle.js"></script>
-        <script  src="/app.bundle.js"></script>
+        <div id="content">${body}</div>
+        <script>window.__INITIAL_DATA__=${serialize(data)}</script> 
+        
     </body>
-</html>
+    <script src="/env.js"></script>
+    <script src="/vendor.bundle.js"></script>
+    <script src="/app.bundle.js"></script>
+</html>`;
+}

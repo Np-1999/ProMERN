@@ -25,7 +25,9 @@ function NavBar() {
       <Nav className="ml-auto">
         <IssueAddNav />
         <NavDropdown title={<ThreeDotsVertical />} id="nav-dropdown">
-          <Nav.Link>About</Nav.Link>
+          <LinkContainer to="/about">
+            <Nav.Link>About</Nav.Link>
+          </LinkContainer>
         </NavDropdown>
       </Nav>
     </Navbar>

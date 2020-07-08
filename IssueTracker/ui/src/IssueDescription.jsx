@@ -1,7 +1,7 @@
 import React from 'react';
 import graphQLFetch from './graphQL.js';
 
-export default class IssueDescription extends React.Component {
+{/*class IssueDescription extends React.Component {
   constructor() {
     super();
     this.state = { issue: {} };
@@ -38,10 +38,18 @@ export default class IssueDescription extends React.Component {
   render() {
     const { issue: { description } } = this.state;
     return (
+      
+    );
+  }
+}*/} 
+export default function IssueDescription({issue}) {
+  if(issue) {
+    return (
       <div>
         <h3>Description</h3>
-        <pre>{description}</pre>
+        <pre>{issue.description}</pre>
       </div>
     );
   }
+  return null;
 }

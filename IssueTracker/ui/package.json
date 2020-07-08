@@ -5,11 +5,11 @@
   "main": "UIServer.js",
   "scripts": {
     "#start": "UI server. HMR is enabled in dev mode.",
-    "start": "nodemon -e js --ignore src/ --ignore public/  ",
+    "start": "node dist/server.js",
     "#compile": "Generates JS bundles for production. Use with start.",
     "compile": "webpack --mode production",
-    "#watch": "Compile, and recompile on any changes.",
-    "watch": "webpack --watch",
+    "#watch-server-hmr": "Recompile server HMR bundle on changes",
+    "watch-server-hmr": "webpack -w --config webpack.serverHMR.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "nikhil.padole1999@gmail.com",
@@ -21,6 +21,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.4",
+    "isomorphic-fetch": "^2.2.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
@@ -29,7 +30,7 @@
     "react-router-bootstrap": "^0.25.0",
     "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.5",
-    "whatwg-fetch": "^3.0.0"
+    "serialize-javascript": "^4.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
@@ -50,6 +51,8 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-middleware": "^3.7.2",
-    "webpack-hot-middleware": "^2.25.0"
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-merge": "^4.2.2",
+    "webpack-node-externals": "^1.7.2"
   }
 }
