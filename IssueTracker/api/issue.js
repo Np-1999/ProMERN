@@ -13,12 +13,14 @@ function validate(issue) {
     throw new UserInputError('Invalid input(s)', { errors });
   }
 }
-async function List(_, { status, effortMin, effortMax }) {
+const PAGE_SIZE = 10;
+async function List(_, { status, effortMin, effortMax, search, page }) {
   const db = getDB();
   const filter = {};
   if (status) {
     filter.status = status;
   }
+  if(search) filter.$text = { $search: search }
   if (effortMin !== undefined || effortMax !== undefined) {
     filter.effort = {};
     if (effortMin !== undefined) {
@@ -28,8 +30,14 @@ async function List(_, { status, effortMin, effortMax }) {
       filter.effort.$lte = effortMax;
     }
   }
-  const issues = await db.collection('issues').find(filter).toArray();
-  return issues;
+  const cursor = db.collection('issues').find(filter)
+                .sort({id:1})
+                .skip(PAGE_SIZE*(page-1))
+                .limit(PAGE_SIZE); 
+  const totalCount = await cursor.count(false);
+  const issues = cursor.toArray();
+  const pages = Math.ceil(totalCount/PAGE_SIZE);
+  return {issues, pages};
 }
 async function Add(_, { issue }) {
   console.log(issue);
@@ -73,6 +81,51 @@ async function Delete(_, { id }) {
   }
   return false;
 }
+async function counts(_,{status, effortMin, effortMax}) {
+  const db = getDB();
+  const filter = {};
+  if (status) {
+    filter.status = status;
+  }
+  if (effortMin !== undefined || effortMax !== undefined) {
+    filter.effort = {};
+    if (effortMin !== undefined) {
+      filter.effort.$gte = effortMin;
+    }
+    if (effortMax !== undefined) {
+      filter.effort.$lte = effortMax;
+    }
+  }
+  const result =await db.collection('issues').aggregate([
+    {$match: filter},
+    {
+      $group:{
+        _id: {owner: '$owner', status:'$status'},
+        count:{$sum:1}
+      }
+    }
+  ]).toArray();
+  const stats = {};
+  result.forEach(result => {
+    const {owner, status: statusKey } = result._id;
+    if(!stats[owner]) stats[owner] = {owner};
+    stats[owner][statusKey] = result.count;
+  });
+  return Object.values(stats);
+}
+async function restore(_,{id}){
+  const db = getDB();
+  const issue = await db.collection('deletedIssue').findOne({ id });
+  if (!issue) return false;
+  issue.deleted = new Date();
+  let result = await db.collection('issues').insertOne(issue);
+  if (result.insertedId) {
+    result = await db.collection('deletedIssue').removeOne({ id });
+    console.log(result.deletedCount);
+    return (result.deletedCount === 1);
+  }
+  return false;
+}
 module.exports = {
-  List, Add, get, update, Delete,
+  List, Add, get, update, Delete, counts, restore
 };

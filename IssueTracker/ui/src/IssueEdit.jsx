@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Accordion, Card, Form, FormLabel, Col, FormControl,
-  FormGroup, Row, ButtonToolbar, ButtonGroup, Button, Alert, Toast,
+  FormGroup, Row, ButtonToolbar, ButtonGroup, Button, Alert
 } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import graphQLFetch from './graphQL.js';
@@ -10,8 +10,9 @@ import NumInput from './NumInput.jsx';
 import DateInput from './DateInput.jsx';
 import TextInput from './TextInput.jsx';
 import store from './store';
+import withToast from './withToast.jsx';
 
-export default class IssueEdit extends React.Component {
+class IssueEdit extends React.Component {
 
   constructor() {
     const issue = store.intialData ? store.intialData.issue : null;
@@ -21,15 +22,12 @@ export default class IssueEdit extends React.Component {
       issue,
       invalidFields: {},
       showingValidation: false,
-      showToast: false,
-      toastMessage: '',
     };
     this.onChange = this.onChange.bind(this);
     this.onValidityChange = this.onValidityChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.showValidation = this.showValidation.bind(this);
     this.dismissValidation = this.dismissValidation.bind(this);
-    this.showError = this.showError.bind(this);
   }
   static async fetchData(match, search, showError){
     const query = ` query issue($id: Int!) {
@@ -81,6 +79,7 @@ export default class IssueEdit extends React.Component {
   async handleSubmit(e) {
     e.preventDefault();
     this.showValidation();
+    const {showError}=this.props;
     const { issue, invalidFields, showingValidation } = this.state;
     console.log(showingValidation);
     if (Object.keys(invalidFields).length !== 0) {
@@ -99,13 +98,13 @@ export default class IssueEdit extends React.Component {
       }
     }`;
     const { id, created, ...changes } = issue;
-    const data = await graphQLFetch(query, { changes, id });
+    const data = await graphQLFetch(query, { changes, id },showError);
     if (data) {
       this.setState({
         issue: data.issueUpdate,
       });
       console.log('After query ');
-      this.showError('Updated issue successfully');
+      showError('Updated issue successfully');
     }
   }
 
@@ -117,17 +116,12 @@ export default class IssueEdit extends React.Component {
     this.setState({ showingValidation: true });
   }
 
-  showError(message) {
-    this.setState({
-      showToast: true,
-      toastMessage: message,
-    });
-  }
 
   async loadData() {
 
     const { match } = this.props;
-    const data = await IssueEdit.fetchData(match,null,this.showError);
+    const { showError } = this.props;
+    const data = await IssueEdit.fetchData(match,null,showError);
     this.setState({ issue: (data ? data.issue : {}), invalidFields: {} });
   }
 
@@ -147,7 +141,7 @@ export default class IssueEdit extends React.Component {
     const { issue: { owner, effort, description } } = this.state;
     const { issue: { created, due } } = this.state;
     const {
-      invalidFields, showingValidation, toastMessage, showToast,
+      invalidFields, showingValidation
     } = this.state;
     let validationMessage;
     if (Object.keys(invalidFields).length !== 0 && showingValidation) {
@@ -242,17 +236,6 @@ export default class IssueEdit extends React.Component {
                   <FormGroup>
                     <Row>
                       <Col sm={3}>
-                        <Toast
-                          show={showToast}
-                          delay={3000}
-                          onClose={() => this.setState({ showToast: false })}
-                          autohide
-                        >
-                          <Toast.Body>
-                            {' '}
-                            {toastMessage}
-                          </Toast.Body>
-                        </Toast>
                       </Col>
                       <Col sm={6}>
                         <ButtonToolbar>
@@ -283,3 +266,6 @@ export default class IssueEdit extends React.Component {
     );
   }
 }
+const IssueEditWithToast = withToast(IssueEdit);
+IssueEditWithToast.fetchData = IssueEdit.fetchData;
+export default IssueEditWithToast;

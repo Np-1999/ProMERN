@@ -37,6 +37,17 @@ type Issue{
     due : GraphQLDate
     description : String
 }
+type IssueCounts {
+    owner: String!
+    New: Int
+    Assigned: Int
+    Fixed: Int
+    Closed: Int
+}
+type IssueListWithPages {
+    issues: [Issue!]!
+    pages: Int
+}
 ### TOP LEVEL DECLARATIONS
 type Query{
     about :String!
@@ -44,12 +55,20 @@ type Query{
     status: StatusType
     effortMin: Int
     effortMax: Int
-    ) : [Issue!]!
+    search: String
+    page: Int = 1
+    ) : IssueListWithPages
     issue (id:Int!) : Issue!
+    IssueCounts(
+        status: StatusType
+        effortMin: Int
+        effortMax: Int
+    ): [IssueCounts!]!
 }
 type Mutation{
     setAboutMessage(message:String!): String!
     issueAdd(issue:IssueInputs!):Issue!
     issueUpdate(id: Int!, changes:issueUpdateInputs!): Issue!
     issueDelete(id: Int!):Boolean!
+    issueRestore(id: Int!):Boolean!
 }

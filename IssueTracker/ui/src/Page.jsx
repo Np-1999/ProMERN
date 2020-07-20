@@ -1,7 +1,8 @@
 import React from 'react';
 import {
-  Navbar, Nav, NavDropdown, Container,
+  Navbar, Nav, NavDropdown, Container, Col
 } from 'react-bootstrap';
+import  Search  from "./Search.jsx";
 import { LinkContainer } from 'react-router-bootstrap';
 import { ThreeDotsVertical } from 'react-bootstrap-icons';
 import Contents from './Contents.jsx';
@@ -21,6 +22,9 @@ function NavBar() {
         <LinkContainer to="/report">
           <Nav.Link>Report</Nav.Link>
         </LinkContainer>
+        <Col sm={12}>
+          <Search />
+        </Col>
       </Nav>
       <Nav className="ml-auto">
         <IssueAddNav />

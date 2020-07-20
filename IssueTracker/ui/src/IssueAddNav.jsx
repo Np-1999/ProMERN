@@ -6,7 +6,6 @@ import {
 import { Plus } from 'react-bootstrap-icons';
 import { withRouter } from 'react-router-dom';
 import graphQLFetch from './graphQL.js';
-
 class IssueAddNav extends React.Component {
   constructor(props) {
     super(props);
