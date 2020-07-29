@@ -8,6 +8,7 @@ import Page from '../src/Page.jsx';
 import store from '../src/store.js';
 
 store.intialData = window.__INITIAL_DATA__;
+store.userData = window.__USER_DATA__;
 const element = (
   <Router>
     <Page />

@@ -5,10 +5,15 @@ import {
 } from 'react-bootstrap';
 import { X, Trash, PencilSquare } from 'react-bootstrap-icons';
 import { LinkContainer } from 'react-router-bootstrap';
+import UserContext from './UserContext.jsx';
 
-const IssueRow = withRouter(({
-  issue, location: { search }, closeIssue, index, deleteIssue,
-}) => {
+class IssueRowPlain extends React.Component {
+  render(){
+    const {
+      issue, location: { search }, closeIssue, deleteIssue, index,
+    } = this.props;
+  const user = this.context;
+  const disabled = !user.signedIn;
   const selectLocation = { pathname: `/issues/${issue.id}`, search };
 
   const closeToolTip = (
@@ -44,16 +49,16 @@ const IssueRow = withRouter(({
       <td>
         <OverlayTrigger placement="bottom" delayShow={1000} overlay={editToolTip}>
           <LinkContainer to={`/edit/${issue.id}`}>
-            <Button size="sm"><PencilSquare /></Button>
+            <Button size="sm" disabled={disabled}><PencilSquare /></Button>
           </LinkContainer>
         </OverlayTrigger>
         {'   '}
         <OverlayTrigger delayShow={1000} overlay={closeToolTip} placement="bottom">
-          <Button size="sm" onClick={onClose }><X /></Button>
+          <Button size="sm" onClick={onClose } disabled={disabled}><X /></Button>
         </OverlayTrigger>
         {'   '}
         <OverlayTrigger placement="bottom" delayShow={1000} overlay={deleteToolTip}>
-          <Button size="sm" onClick= { onDelete } ><Trash /></Button>
+          <Button size="sm" onClick= { onDelete } disabled={disabled}><Trash /></Button>
         </OverlayTrigger>
       </td>
     </tr>
@@ -63,7 +68,12 @@ const IssueRow = withRouter(({
       {tableRow}
     </LinkContainer>
   );
-});
+}
+}
+IssueRowPlain.contextType = UserContext;
+const IssueRow = withRouter(IssueRowPlain);
+delete IssueRow.contextType;
+
 
 export default function IssueTable({ issues, closeIssue, deleteIssue }) {
   const issueRows = issues.map((issue, index) => (
@@ -76,7 +86,7 @@ export default function IssueTable({ issues, closeIssue, deleteIssue }) {
     />
   ));
   return (
-    <Table bordered condensed hover responsive>
+    <Table bordered  hover responsive>
       <thead>
         <tr>
           <th>ID</th>

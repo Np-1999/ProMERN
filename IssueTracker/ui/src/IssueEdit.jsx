@@ -11,6 +11,7 @@ import DateInput from './DateInput.jsx';
 import TextInput from './TextInput.jsx';
 import store from './store';
 import withToast from './withToast.jsx';
+import UserContext from './UserContext.jsx';
 
 class IssueEdit extends React.Component {
 
@@ -151,6 +152,7 @@ class IssueEdit extends React.Component {
         </Alert>
       );
     }
+    const user = this.context;
     return (
       <Accordion defaultActiveKey="0">
         <Card>
@@ -240,7 +242,7 @@ class IssueEdit extends React.Component {
                       <Col sm={6}>
                         <ButtonToolbar>
                           <ButtonGroup className="mr-2">
-                            <Button variant="primary" type="submit">Submit</Button>
+                            <Button disabled={!user.signedIn} variant="primary" type="submit">Submit</Button>
                           </ButtonGroup>
                           <ButtonGroup>
                             <LinkContainer to="/issues">
@@ -266,6 +268,7 @@ class IssueEdit extends React.Component {
     );
   }
 }
+IssueEdit.contextType = UserContext;
 const IssueEditWithToast = withToast(IssueEdit);
 IssueEditWithToast.fetchData = IssueEdit.fetchData;
 export default IssueEditWithToast;

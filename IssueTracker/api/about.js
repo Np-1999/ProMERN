@@ -1,3 +1,4 @@
+const { mustBeSignedIn } = require('./auth.js');
 let aboutMessage = 'Issue Tracker API v1.0';
 function setAboutMessage(_, { message }) {
   aboutMessage = message;
@@ -6,4 +7,4 @@ function setAboutMessage(_, { message }) {
 function getAboutMessage() {
   return aboutMessage;
 }
-module.exports = { getAboutMessage, setAboutMessage };
+module.exports = { getAboutMessage, setAboutMessage:mustBeSignedIn(setAboutMessage) };

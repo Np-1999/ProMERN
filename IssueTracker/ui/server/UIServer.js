@@ -16,6 +16,10 @@ SourceMapSupport.install();
 const apiProxyTarget = process.env.API_PROXY_TARGET;
 if (apiProxyTarget) {
   app.use('/graphql', createProxyMiddleware({ target: apiProxyTarget }));
+  app.use('/auth', createProxyMiddleware({target: apiProxyTarget}));
+}
+if(!process.env.UI_AUTH_ENDPOINT){
+  process.env.UI_AUTH_ENDPOINT = 'http://localhost:3000/auth';
 }
 if(!process.env.UI_API_ENDPOINT) {
   process.env.UI_API_ENDPOINT = 'http://localhost:3000/graphql';
@@ -24,7 +28,11 @@ if(!process.env.UI_SERVER_API_ENDPOINT) {
   process.env.UI_SERVER_API_ENDPOINT = process.env.UI_API_ENDPOINT;
 }
 app.get('/env.js', (req, res) => {
-  const env = { UI_API_ENDPOINT: process.env.UI_API_ENDPOINT };
+  const env = { 
+    UI_API_ENDPOINT: process.env.UI_API_ENDPOINT,
+    UI_AUTH_ENDPOINT: process.env.UI_AUTH_ENDPOINT, 
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID 
+  };
   res.send(`window.ENV=${JSON.stringify(env)}`);
 });
 const enableHMR = (process.env.ENABLE_HMR || 'true') === 'true';

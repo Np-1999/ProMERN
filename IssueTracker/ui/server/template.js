@@ -1,8 +1,9 @@
 import serialize from 'serialize-javascript';
-export default function template(body,data) {
+export default function template(body,intialData,userData) {
     return `<html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://apis.google.com/js/api:client.js"></script>
         <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />        
         <style>
             .test{
@@ -25,8 +26,9 @@ export default function template(body,data) {
     </head>
     <body>
         <div id="content">${body}</div>
-        <script>window.__INITIAL_DATA__=${serialize(data)}</script> 
-        
+        <script>window.__INITIAL_DATA__=${serialize(intialData)}
+                window.__USER_DATA__=${serialize(userData)}
+        </script> 
     </body>
     <script src="/env.js"></script>
     <script src="/vendor.bundle.js"></script>

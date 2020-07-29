@@ -3,6 +3,7 @@ const { ApolloServer } = require('apollo-server-express');
 const GraphQLDate = require('./graphql_date.js');
 const about = require('./about.js');
 const issue = require('./issue.js');
+const auth = require('./auth.js');
 require('dotenv').config({ path: 'sample.env' });
 
 const resolvers = {
@@ -11,6 +12,7 @@ const resolvers = {
     issueList: issue.List,
     issue: issue.get,
     IssueCounts: issue.counts,
+    user: auth.resolveUser,
   },
   Mutation: {
     setAboutMessage: about.setAboutMessage,
@@ -22,9 +24,15 @@ const resolvers = {
   GraphQLDate,
 };
 
+function getContext({req}) {
+  const user = auth.getUser(req);
+  return { user };
+}
+
 const server = new ApolloServer({
   typeDefs: fs.readFileSync('schema.graphql', 'utf-8'),
   resolvers,
+  context:getContext,
   formatError: (error) => { // Error report at serverside
     console.log(error);
     return error;
@@ -32,7 +40,16 @@ const server = new ApolloServer({
 });
 function installHandler(app) {
   const enableCors = (process.env.ENABLE_CORS || 'true') === 'true';
+  
+  let cors;
+  if(enableCors){
+    const origin = process.env.UI_SERVER_ORIGIN || 'http://localhost:8000';
+    const methods = 'POST';
+    cors = {origin, methods, credentials: true};
+  }else{
+    cors = 'false';
+  }
   console.log('CORS setting:', enableCors);
-  server.applyMiddleware({ app, path: '/graphql', cors: enableCors });
+  server.applyMiddleware({ app, path: '/graphql', cors});
 }
 module.exports = { installHandler };

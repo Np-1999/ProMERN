@@ -14,7 +14,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 const SECTION_SIZE = 5;
 function PageLink({params, page, activePage, children}) {
   params.set('page',page);
-  if(page==0) return React.cloneElement(children, {disableb:true});
+  if(page==0) return React.cloneElement(children, {disabled:true});
   return(
     <LinkContainer 
       isActive={ ()=> page == activePage }
